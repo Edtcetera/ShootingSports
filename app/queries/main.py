@@ -1,12 +1,17 @@
 from app.util.util import gzipped
+from app.db.database import Shooter, Member, DropIn, Match, Competitor, Stage, Score, db
+from app.db.enums import Status, Pal, Division
 from flask import Blueprint, request, render_template, jsonify
-from app.db.database import Shooter, Member, DropIn, Match, Competitor, Stage, db
-from sqlalchemy import text
-import app.queries.models as helper
+import datetime
+from sqlalchemy import and_, text
+from sqlalchemy.orm.session import sessionmaker
+from dateutil.relativedelta import relativedelta
 
 
 # Define the blueprint: 'queries'
 queries = Blueprint('queries', __name__)
+# global scope
+Session = sessionmaker(bind=db.engine)
 
 
 @queries.route('/')
@@ -16,6 +21,85 @@ def load():
     Loads the HTML template
     """
     return render_template("dashboard.html")
+
+@queries.route('/db_tables', methods=['GET'])
+def get_tables():
+    """
+    Gets all rows for all tables
+    :return:
+    """
+    tables_map = {
+        "shooter": Shooter.__table__.columns.keys(),
+        "member": Member.__table__.columns.keys(),
+        "dropIn": DropIn.__table__.columns.keys(),
+        "match": Match.__table__.columns.keys(),
+        "competitor": Competitor.__table__.columns.keys(),
+        "stage": Stage.__table__.columns.keys(),
+        "score": Score.__table__.columns.keys()
+    }
+
+    table_name = request.args.get('table_name').lower()
+    available_tables = ['shooter', 'member', 'dropIn', 'match',
+                        'competitor', 'stage', 'score']
+
+    if table_name in available_tables:
+        sql = text("""SELECT * FROM """ + table_name)
+        rows = db.engine.execute(sql)
+
+        headers = tables_map[table_name]
+        data = [list(row[1:]) for row in rows]
+        return jsonify({
+            'code': 200,
+            'table': table_name,
+            'entries': data,
+            'headers': headers
+        })
+
+    else:
+        return jsonify({
+            'code': 400,
+            'error': 'Table Name was not valid'
+    })
+
+@queries.route('/member_expiry', methods =['GET'])
+def get_expiry():
+    """
+    Returns the membership IDs of memberships expiring within 'time_frame' amount of MONTHS
+    """
+
+    time_frame = request.args.get('time_frame')
+    try:
+        time_frame = int(time_frame)
+    except ValueError as e:
+        print(e)
+        return jsonify({
+            'code': 400,
+            'error': 'Not valid monthly time frame, should only be int'
+        })
+
+    expiring_members = []
+    session = Session()
+    now = datetime.date.today()
+    relativeMonths = now - relativedelta(months=time_frame)
+    memberShooterTable = session.query(Member, Shooter) \
+        .join(Shooter) \
+        .filter(and_(Member.endDate > relativeMonths, Member.status != Status.EXPIRED))
+    print("Memberships expiring with " + str(time_frame) + " months")
+    for row in memberShooterTable:
+        print(row)
+        print(row.Member.email)
+        print(row.Shooter.name)
+        returnMember = {'name': row.Shooter.name,
+                        'mid': row.Member.mid,
+                        'email': row.Member.email,
+                        'endDate': row.Member.endDate}
+        expiring_members.append(returnMember)
+
+    return jsonify({
+        'code': 200,
+        'table': 'Expiring Members',
+        'entries': expiring_members
+    })
 
 
 # """ SELECT QUERIES """
