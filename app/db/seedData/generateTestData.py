@@ -140,7 +140,7 @@ def make():
     dropIns['sid'] = dropIn_sid
     dropIns['did'] = dropIn_did
 
-    competitors['sid'] = np.random.choice(shooters_sid, SHOOTER_COUNT, replace=True)
+    competitors['sid'] = np.random.choice(shooters_sid, SHOOTER_COUNT, replace=False)
     competitors['matchid'] = matchid
     competitors['division'] = competitor_division
     competitors['isdq'] = competitor_isdq
