@@ -79,10 +79,22 @@ def get_match_ranking():
         print(e)
         return jsonify({
             'code': 400,
-            'error': 'Not valid monthly time frame, should only be int'
+            'error': 'Not valid match id, must be an int'
+        })
+    session = Session()
+
+    existing_matches = []
+    existing_matches_query = session.query(Match)
+
+    for match in existing_matches_query:
+        existing_matches.append(match.matchid)
+
+    if match_id not in existing_matches:
+        return jsonify({
+            'code': 400,
+            'error': 'No such match exists in database'
         })
 
-    session = Session()
     scores_in_match = session.query(Score, Competitor, Shooter) \
         .filter(Score.matchid == match_id)\
         .join(Competitor, and_(Competitor.sid == Score.sid, Competitor.matchid == Score.matchid))\
@@ -106,7 +118,7 @@ def get_match_ranking():
 
         for string in stage_strings:
             average_stage_time += string
-        average_stage_time = average_stage_time / 4 #average for 4 strings (exclude dropped)
+        average_stage_time = float(average_stage_time / 4) #average for 4 strings (exclude dropped)
 
         stage_score = {
             "name": stage_score.Shooter.name,
@@ -132,8 +144,11 @@ def get_match_ranking():
 
     ranked_competitors = sorted(competitor_scores, key=lambda k: k['time'])
 
-    for competitor in ranked_competitors:
-        print(competitor)
+    return jsonify({
+        'code': 200,
+        'table': 'Match ' + str(match_id) + " ranking",
+        'entries': ranked_competitors
+    })
 
 
 @queries.route('/member_expiry', methods =['GET'])
