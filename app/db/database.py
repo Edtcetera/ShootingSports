@@ -34,7 +34,7 @@ class Member(db.Model):
     __tablename__ = 'Member'
 
     mid = db.Column('mid', db.Integer, primary_key=True)
-    sid = db.Column('sid', db.Integer, db.ForeignKey('Shooter.sid'))
+    sid = db.Column('sid', db.Integer, db.ForeignKey(Shooter.sid))
     status = db.Column('status', db.Enum(Status), nullable=False)
     pal = db.Column('pal', db.Enum(Pal), nullable=False)
     email = db.Column('email', db.String(100))
@@ -62,7 +62,7 @@ class DropIn(db.Model):
     __tablename__ = 'DropIn'
 
     did = db.Column('did', db.Integer, primary_key=True)
-    sid = db.Column('sid', db.Integer, db.ForeignKey('Shooter.sid'))
+    sid = db.Column('sid', db.Integer, db.ForeignKey(Shooter.sid))
 
     def __init__(self, did, sid):
         self.did = did
@@ -85,8 +85,8 @@ class Match(db.Model):
 class Competitor(db.Model):
     __tablename__ = 'Competitor'
 
-    sid = db.Column('sid', db.Integer, db.ForeignKey('Shooter.sid'), primary_key=True)
-    matchid = db.Column('matchid', db.Integer, db.ForeignKey('Match.matchid'), primary_key=True)
+    sid = db.Column('sid', db.Integer, db.ForeignKey(Shooter.sid), primary_key=True)
+    matchid = db.Column('matchid', db.Integer, db.ForeignKey(Match.matchid), primary_key=True)
     division = db.Column('division', db.Enum(Division), nullable=False)
     isDQ = db.Column('isDQ', db.Boolean, nullable=False)
 
@@ -110,7 +110,7 @@ class Stage(db.Model):
 class Score(db.Model):
     __tablename__ = 'Score'
 
-    sid = db.Column('sid', db.Integer, db.ForeignKey('Shooter.sid'), primary_key=True)
+    sid = db.Column('sid', db.Integer, db.ForeignKey(Shooter.sid), primary_key=True)
     matchid = db.Column('matchid', db.ForeignKey(Match.matchid), primary_key=True)
     stageid = db.Column('stageid', db.ForeignKey(Stage.stageid), primary_key=True)
     s1 = db.Column('s1', db.Numeric) #need to support to 2 decimal spaces example: 5.23s
