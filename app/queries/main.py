@@ -72,15 +72,31 @@ def get_match_ranking():
     """
 
     match_id = request.args.get('match_id')
+    division_type = request.args.get('division')
     try:
         match_id = int(match_id)
-        print(match_id)
+        if division_type != 'overall' and not Division.has_value(division_type):
+            raise TypeError
+
+        if division_type == 'overall':
+            pass
+        elif Division.has_value(division_type):
+            division_type = Division(division_type).name
+        else:
+            raise TypeError
     except ValueError as e:
         print(e)
         return jsonify({
             'code': 400,
             'error': 'Not valid match id, must be an int'
         })
+    except TypeError as e:
+        print(e)
+        return jsonify({
+            'code': 400,
+            'error': 'Not a valid division string'
+        })
+
     session = Session()
 
     existing_matches = []
@@ -95,11 +111,18 @@ def get_match_ranking():
             'error': 'No such match exists in database'
         })
 
-    scores_in_match = session.query(Score, Competitor, Shooter) \
-        .filter(Score.matchid == match_id)\
-        .join(Competitor, and_(Competitor.sid == Score.sid, Competitor.matchid == Score.matchid))\
-        .filter(Competitor.isDQ != 'DQ')\
-        .join(Shooter, Score.sid == Shooter.sid)
+    if division_type == 'overall':
+        scores_in_match = session.query(Score, Competitor, Shooter) \
+            .filter(Score.matchid == match_id) \
+            .join(Competitor, and_(Competitor.sid == Score.sid, Competitor.matchid == Score.matchid)) \
+            .filter(Competitor.isDQ != 'DQ') \
+            .join(Shooter, Score.sid == Shooter.sid)
+    else:
+        scores_in_match = session.query(Score, Competitor, Shooter) \
+            .filter(Score.matchid == match_id) \
+            .join(Competitor, and_(Competitor.sid == Score.sid, Competitor.matchid == Score.matchid)) \
+            .filter(and_(Competitor.isDQ != 'DQ', Competitor.division == division_type)) \
+            .join(Shooter, Score.sid == Shooter.sid)
 
     stage_scores = []
     last_competitor = -1

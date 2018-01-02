@@ -18,4 +18,8 @@ class Division(enum.Enum):
     CLASSIC = 'classic'
     PRODUCTION = 'production'
     REVOLVER = 'revolver'
-    PRODUCTION_OPTICS = 'production optics'
+    PRODUCTION_OPTICS = 'production_optics'
+
+    @classmethod
+    def has_value(cls, value):
+        return(any(value == item.value for item in cls))
