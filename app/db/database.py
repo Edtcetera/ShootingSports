@@ -113,11 +113,11 @@ class Score(db.Model):
     sid = db.Column('sid', db.Integer, db.ForeignKey(Shooter.sid), primary_key=True)
     matchid = db.Column('matchid', db.ForeignKey(Match.matchid), primary_key=True)
     stageid = db.Column('stageid', db.ForeignKey(Stage.stageid), primary_key=True)
-    s1 = db.Column('s1', db.Numeric) #need to support to 2 decimal spaces example: 5.23s
-    s2 = db.Column('s2', db.Numeric)
-    s3 = db.Column('s3', db.Numeric)
-    s4 = db.Column('s4', db.Numeric)
-    s5 = db.Column('s5', db.Numeric)
+    s1 = db.Column('s1', db.String(100)) #need to support to 2 decimal spaces example: 5.23s
+    s2 = db.Column('s2', db.String(100))
+    s3 = db.Column('s3', db.String(100))
+    s4 = db.Column('s4', db.String(100))
+    s5 = db.Column('s5', db.String(100))
 
     def __init__(self, sid, matchid, stageid, s1, s2, s3, s4, s5):
         self.sid = sid

@@ -176,11 +176,11 @@ def generate():
             scores_sid.append(getattr(row, 'sid'))
             scores_matchid.append(getattr(row, 'matchid'))
             scores_stageid.append(stageCount)
-            scores_str1.append(random.randint(0, 5000)) #time in ms
-            scores_str2.append(random.randint(0, 5000))
-            scores_str3.append(random.randint(0, 5000))
-            scores_str4.append(random.randint(0, 5000))
-            scores_str5.append(random.randint(0, 5000))
+            scores_str1.append(str(random.randint(0, 5000))) #time in ms, sqlite cannot handle DECIMAL
+            scores_str2.append(str(random.randint(0, 5000)))
+            scores_str3.append(str(random.randint(0, 5000)))
+            scores_str4.append(str(random.randint(0, 5000)))
+            scores_str5.append(str(random.randint(0, 5000)))
             stageCount += 1
 
     scores['sid'] = scores_sid

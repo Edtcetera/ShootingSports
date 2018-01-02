@@ -108,17 +108,17 @@ def get_match_ranking():
             last_competitor = stage_score.Shooter.sid
         stage_strings = []
         average_stage_time = 0
-        stage_strings.append(stage_score.Score.s1)
-        stage_strings.append(stage_score.Score.s2)
-        stage_strings.append(stage_score.Score.s3)
-        stage_strings.append(stage_score.Score.s4)
-        stage_strings.append(stage_score.Score.s5)
+        stage_strings.append(float(stage_score.Score.s1))
+        stage_strings.append(float(stage_score.Score.s2))
+        stage_strings.append(float(stage_score.Score.s3))
+        stage_strings.append(float(stage_score.Score.s4))
+        stage_strings.append(float(stage_score.Score.s5))
         stage_strings.sort()
         stage_strings.pop() #Drop the highest time
 
         for string in stage_strings:
             average_stage_time += string
-        average_stage_time = float(average_stage_time / 4) #average for 4 strings (exclude dropped)
+        average_stage_time = average_stage_time / 4 #average for 4 strings (exclude dropped)
 
         stage_score = {
             "name": stage_score.Shooter.name,
