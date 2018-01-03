@@ -4,6 +4,9 @@ from app.util.util import gzipped
 
 # Define the WSGI application object
 app = Flask(__name__)
+app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = 'super-secret'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 2628000           # This caches all static files (1 month)
 app.config.from_object('config')
 
