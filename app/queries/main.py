@@ -24,6 +24,7 @@ def load():
     return render_template("dashboard.html")
 
 @queries.route('/db_tables', methods=['GET'])
+@login_required
 def get_tables():
     """
     Gets all rows for all tables

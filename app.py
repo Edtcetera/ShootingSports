@@ -1,11 +1,9 @@
 #!flask/bin/python
 from app import app
 from flask_security import Security, SQLAlchemyUserDatastore
-from flask_sqlalchemy import SQLAlchemy
+from flask_security.utils import hash_password
 from sqlalchemy.exc import OperationalError
 from app.db.database import User, Role, db
-
-# db = SQLAlchemy(app)
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -18,10 +16,10 @@ def create_user():
     try:
         if user_datastore.get_user('test@test.com') is None:
             print('Test user not present, creating test user')
-            user_datastore.create_user(email='test@test.com', password='password')
+            user_datastore.create_user(email='test@test.com', password=hash_password('password'))
     except OperationalError:
         print('User table is not initiated, creating test user and inserting')
-        user_datastore.create_user(email='test@test.com', password='password')
+        user_datastore.create_user(email='test@test.com', password=hash_password('password'))
     db.session.commit()
 
 app.run()

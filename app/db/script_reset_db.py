@@ -4,6 +4,8 @@ import app.db.script_create_tables as create
 def run():
     print("Dropping Tables")
     drop.drop()
+    print("Dropping users")
+    drop.dropAuthUsers()
 
     print("Creating Tables")
     create.create()
