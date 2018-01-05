@@ -37,6 +37,10 @@
             fill: #fff;
         }
 
+        h3 {
+            color: white;
+        }
+
         .card-header {
             padding: 15px !important;
         }
@@ -51,28 +55,8 @@
             border-width: 0px 0px 0px 0px;
         }
 
-        .divider {
-            height: 1px;
-            width: 100%;
-            display: block; /* for use on default inline elements like span */
-            margin: 9px 0;
-            overflow: hidden;
-            background-color: #547066;
-        }
-
-        /*
-        Darcula color scheme from the JetBrains family of IDEs
-        */
-
-        .hljs {
-            display: block;
-            overflow-x: auto;
-            padding: 0.5em;
-            background: #2b2b2b;
-        }
-
-        .hljs {
-            color: #bababa;
+        .nav {
+            background-color: #999;
         }
 
         .main-panel > .footer {
@@ -96,9 +80,25 @@
             color: papayawhip;
         }
 
-        a:hover, a:active {
+        a:hover, a:active, a:focus {
             text-decoration: none;
             color: papayawhip;
+        }
+
+        .radio label .check {
+            height: 15px;
+            width: 15px;
+            border-radius: 100%;
+            background-color: #547066;
+            transform: scale3d(0, 0, 0);
+        }
+
+        .radio input[type=radio]:checked ~ .check {
+            background-color: #547066;
+        }
+
+        .radio input[type=radio]:checked ~ .circle {
+            border-color: #547066;
         }
 
     </style>
@@ -112,9 +112,53 @@
             <div class="col-md-10 col-md-offset-1">
                 <div class="card" style="box-shadow: none;">
                     <div class="card-header" style="padding: 15px;text-align: center;">
-                        <h2 class="title">UBC Shooting Sports Match System</h2>
+                        <h2 class="title">UBC Shooting Sports</h2>
+                        <h2 class="title">Match and Membership System</h2>
                     </div>
-                    <div class="card-content" style="padding-top:30px;">
+                    <div class="card-content" style="padding-top:20px;">
+                        <ul class="nav nav-tabs">
+                            <li role="presentation" class="active"><a href="#ranking" data-toggle="tab">Match
+                                Ranking</a></li>
+                            <li role="presentation"><a href="#membership" data-toggle="tab">Membership</a></li>
+                        </ul>
+                        <div class="tab-content clearfix">
+                            <div class="tab-pane active" id="ranking">
+                                <form>
+                                    <div class="form-group">
+                                        <label for="match">Match ID</label>
+                                        <input type="text" class="form-control" id="matchID"
+                                               placeholder="Match ID">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="Division">Division</label>
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio">Overall</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio">Open</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio">Standard</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio">Classic</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio">Production</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio">Production Optics</label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-default">Submit</button>
+                                </form>
+                            </div>
+                            <div class="tab-pane" id="membership">
+                                <h3>We use the class nav-pills instead of nav-tabs which automatically creates a
+                                    background
+                                    color for the tab</h3>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
