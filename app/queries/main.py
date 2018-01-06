@@ -6,6 +6,7 @@ import datetime
 from sqlalchemy import and_, text
 from sqlalchemy.orm.session import sessionmaker
 from dateutil.relativedelta import relativedelta
+from flask_security import login_required
 
 
 # Define the blueprint: 'queries'
@@ -13,8 +14,8 @@ queries = Blueprint('queries', __name__)
 # global scope
 Session = sessionmaker(bind=db.engine)
 
-
 @queries.route('/')
+@login_required
 @gzipped
 def load():
     """
@@ -23,6 +24,7 @@ def load():
     return render_template("dashboard.html")
 
 @queries.route('/db_tables', methods=['GET'])
+@login_required
 def get_tables():
     """
     Gets all rows for all tables

@@ -24,3 +24,4 @@ flask_security
 python-dateutil
 numpy
 pandas
+bcrypt
