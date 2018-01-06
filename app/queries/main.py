@@ -63,6 +63,119 @@ def get_tables():
             'error': 'Table Name was not valid'
     })
 
+@queries.route('/match_ranking', methods =['GET'])
+def get_match_ranking():
+    """
+    Given a match id, shows the rankings of participating competitors
+    The lower the overall match time, the higher ranking the player
+    Stage rank is determined by average of lowest 4 times
+    Match rank is determined by aggregating all average stage times
+    Excludes DQ'd competitors
+    """
+
+    match_id = request.args.get('match_id')
+    division_type = request.args.get('division')
+    try:
+        match_id = int(match_id)
+        if division_type != 'overall' and not Division.has_value(division_type):
+            raise TypeError
+
+        if division_type == 'overall':
+            pass
+        elif Division.has_value(division_type):
+            division_type = Division(division_type).name
+        else:
+            raise TypeError
+    except ValueError as e:
+        print(e)
+        return jsonify({
+            'code': 400,
+            'error': 'Not valid match id, must be an int'
+        })
+    except TypeError as e:
+        print(e)
+        return jsonify({
+            'code': 400,
+            'error': 'Not a valid division string'
+        })
+
+    session = Session()
+
+    existing_matches = []
+    existing_matches_query = session.query(Match)
+
+    for match in existing_matches_query:
+        existing_matches.append(match.matchid)
+
+    if match_id not in existing_matches:
+        return jsonify({
+            'code': 400,
+            'error': 'No such match exists in database'
+        })
+
+    if division_type == 'overall':
+        scores_in_match = session.query(Score, Competitor, Shooter) \
+            .filter(Score.matchid == match_id) \
+            .join(Competitor, and_(Competitor.sid == Score.sid, Competitor.matchid == Score.matchid)) \
+            .filter(Competitor.isDQ != 'DQ') \
+            .join(Shooter, Score.sid == Shooter.sid)
+    else:
+        scores_in_match = session.query(Score, Competitor, Shooter) \
+            .filter(Score.matchid == match_id) \
+            .join(Competitor, and_(Competitor.sid == Score.sid, Competitor.matchid == Score.matchid)) \
+            .filter(and_(Competitor.isDQ != 'DQ', Competitor.division == division_type)) \
+            .join(Shooter, Score.sid == Shooter.sid)
+
+    stage_scores = []
+    last_competitor = -1
+    for stage_score in scores_in_match:
+        if (last_competitor != stage_score.Shooter.sid):
+            last_competitor = stage_score.Shooter.sid
+        stage_strings = []
+        average_stage_time = 0
+        stage_strings.append(float(stage_score.Score.s1))
+        stage_strings.append(float(stage_score.Score.s2))
+        stage_strings.append(float(stage_score.Score.s3))
+        stage_strings.append(float(stage_score.Score.s4))
+        stage_strings.append(float(stage_score.Score.s5))
+        stage_strings.sort()
+        stage_strings.pop() #Drop the highest time
+
+        for string in stage_strings:
+            average_stage_time += string
+        average_stage_time = average_stage_time / 4 #average for 4 strings (exclude dropped)
+
+        stage_score = {
+            "name": stage_score.Shooter.name,
+            "sid": stage_score.Shooter.sid,
+            "stage_number": stage_score.Score.stageid,
+            "average_stage_time": average_stage_time
+        }
+        stage_scores.append(stage_score)
+
+    last_competitor = -1
+    competitor_scores = []
+    for stage_score in stage_scores:
+        if (last_competitor != stage_score["sid"]):
+            last_competitor = stage_score["sid"]
+            competitor = {
+                "name": stage_score["name"],
+                "sid": stage_score["sid"],
+                "time": stage_score["average_stage_time"]
+            }
+            competitor_scores.append(competitor)
+        else:
+            competitor_scores[len(competitor_scores)-1]["time"] += stage_score["average_stage_time"]
+
+    ranked_competitors = sorted(competitor_scores, key=lambda k: k['time'])
+
+    return jsonify({
+        'code': 200,
+        'table': 'Match ' + str(match_id) + " ranking",
+        'entries': ranked_competitors
+    })
+
+
 @queries.route('/member_expiry', methods =['GET'])
 def get_expiry():
     """
@@ -102,7 +215,6 @@ def get_expiry():
         'table': 'Expiring Members',
         'entries': expiring_members
     })
-
 
 # """ SELECT QUERIES """
 #

@@ -1,16 +1,15 @@
 from app.db.database import Shooter, Member, DropIn, Match, Competitor, Stage, Score, db
-from sqlalchemy import Column, Integer, Float, Date, String, VARCHAR
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 import json
 import random
 import pandas as pd
 import numpy as np
+import os
 from app.db.enums import Status, Pal, Division
 import time
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 SHOOTER_COUNT = 50
 MATCH_COUNT = 5
 STRINGS_IN_MATCH = 5
@@ -35,10 +34,10 @@ def strTimeProp(start, end, format, prop):
 def randomDate(start, end, prop):
     return strTimeProp(start, end, '%m/%d/%Y', prop)
 
-def make():
-    data = json.load(open('names.json'))
+def generate():
+    data = json.load(open(os.path.join(basedir, 'names.json')))
     seedSize = len(data)
-    print("Size of name seed input: " + str(seedSize))
+    # print("Size of name seed input: " + str(seedSize))
 
     shooters = pd.DataFrame()
     members = pd.DataFrame()
@@ -140,7 +139,7 @@ def make():
     dropIns['sid'] = dropIn_sid
     dropIns['did'] = dropIn_did
 
-    competitors['sid'] = np.random.choice(shooters_sid, SHOOTER_COUNT, replace=True)
+    competitors['sid'] = np.random.choice(shooters_sid, SHOOTER_COUNT, replace=False)
     competitors['matchid'] = matchid
     competitors['division'] = competitor_division
     competitors['isdq'] = competitor_isdq
@@ -177,11 +176,11 @@ def make():
             scores_sid.append(getattr(row, 'sid'))
             scores_matchid.append(getattr(row, 'matchid'))
             scores_stageid.append(stageCount)
-            scores_str1.append(random.randint(0, 5000)) #time in ms
-            scores_str2.append(random.randint(0, 5000))
-            scores_str3.append(random.randint(0, 5000))
-            scores_str4.append(random.randint(0, 5000))
-            scores_str5.append(random.randint(0, 5000))
+            scores_str1.append(str(random.randint(0, 5000))) #time in ms, sqlite cannot handle DECIMAL
+            scores_str2.append(str(random.randint(0, 5000)))
+            scores_str3.append(str(random.randint(0, 5000)))
+            scores_str4.append(str(random.randint(0, 5000)))
+            scores_str5.append(str(random.randint(0, 5000)))
             stageCount += 1
 
     scores['sid'] = scores_sid
@@ -193,25 +192,26 @@ def make():
     scores['s4'] = scores_str4
     scores['s5'] = scores_str5
 
-    print("SHOOTER TABLE")
-    print(shooters)
-    print("MEMBER TABLE")
-    print(members)
-    print("DROPIN TABLE")
-    print(dropIns)
-    print("COMPETITORS TABLE")
-    print(competitors)
-    print("MATCHES TABLE")
-    print(matches)
-    print("STAGES TABLE")
-    print(stages)
-    print("SCORES TABLE")
-    print(scores)
+    # print("SHOOTER TABLE")
+    # print(shooters)
+    # print("MEMBER TABLE")
+    # print(members)
+    # print("DROPIN TABLE")
+    # print(dropIns)
+    # print("COMPETITORS TABLE")
+    # print(competitors)
+    # print("MATCHES TABLE")
+    # print(matches)
+    # print("STAGES TABLE")
+    # print(stages)
+    # print("SCORES TABLE")
+    # print(scores)
 
     toSqlTable(shooters, members, dropIns, matches, competitors, stages, scores)
 
 
 def toSqlTable(shooter, member, dropin, match, competitor, stage, score):
+    print("To sql table")
     shooter.to_sql(con=db.engine, name=Shooter.__tablename__, if_exists='replace')
     member.to_sql(con=db.engine, name=Member.__tablename__, if_exists='replace')
     dropin.to_sql(con=db.engine, name=DropIn.__tablename__, if_exists='replace')
@@ -219,7 +219,5 @@ def toSqlTable(shooter, member, dropin, match, competitor, stage, score):
     competitor.to_sql(con=db.engine, name=Competitor.__tablename__, if_exists='replace')
     stage.to_sql(con=db.engine, name=Stage.__tablename__, if_exists='replace')
     score.to_sql(con=db.engine, name=Score.__tablename__, if_exists='replace')
+    print("Finished generating test data")
 
-
-make()
-print("Finished generating test data")

@@ -4,47 +4,47 @@ from app.db.database import db
 def create():
 
     db.engine.execute('''CREATE TABLE Shooter (
-                          sid INT,
-                          name VARCHAR)''')
+                          sid BIGINT,
+                          name TEXT)''')
 
     db.engine.execute('''CREATE TABLE Member (
-                          mid INT,
-                          sid INT,
-                          status VARCHAR,
-                          pal VARCHAR,
-                          email VARCHAR,
-                          ubcID VARCHAR,
-                          phone VARCHAR,
+                          mid BIGINT,
+                          sid BIGINT,
+                          status TEXT,
+                          pal TEXT,
+                          email TEXT,
+                          ubcID BIGINT,
+                          phone BIGINT,
                           startDate DATETIME,
                           endDate DATETIME)''')
 
     db.engine.execute('''CREATE TABLE DropIn (
-                          did INT ,
-                          sid INT)''')
+                          did BIGINT ,
+                          sid BIGINT)''')
 
     db.engine.execute('''CREATE TABLE Match (
-                          matchid INT ,
-                          name VARCHAR ,
+                          matchid BIGINT ,
+                          name TEXT ,
                           date DATETIME)''')
 
     db.engine.execute('''CREATE TABLE Competitor (
                             sid INT ,
-                            matchid INT,
-                            division VARCHAR,
-                            isDQ BOOLEAN)''')
+                            matchid BIGINT,
+                            division TEXT,
+                            isDQ TEXT)''')
 
     db.engine.execute('''CREATE TABLE Stage (
-                          stageid INT ,
-                          matchid INT)''')
+                          stageid BIGINT ,
+                          matchid BIGINT)''')
 
     db.engine.execute('''CREATE TABLE Score (
-                            sid INT,
-                            matchid INT,
-                            stageid INT,
-                            s1 NUMERIC,
-                            s2 NUMERIC,
-                            s3 NUMERIC,
-                            s4 NUMERIC,
-                            s5 NUMERIC)''')
+                            sid BIGINT,
+                            matchid BIGINT,
+                            stageid BIGINT,
+                            s1 BIGINT,
+                            s2 BIGINT,
+                            s3 BIGINT,
+                            s4 BIGINT,
+                            s5 BIGINT)''')
 
     print("Tables have been created\n")
